@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:memgeo/feedObject.dart' as feed;
+import 'package:memgeo/recordingButton.dart' as recordingButton;
+import 'package:memgeo/models/recorder_model.dart';
+import 'package:provider/provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,17 +11,18 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
-
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
-    );
+    return ChangeNotifierProvider(
+        create: (_) => RecorderProvider(),
+        child: MaterialApp(
+          title: 'Flutter Demo',
+          theme: ThemeData(
+            primarySwatch: Colors.blue,
+          ),
+          home: const MyHomePage(title: 'Flutter Demo Home Page'),
+        ));
   }
 }
 
@@ -54,12 +59,19 @@ class _MyHomePageState extends State<MyHomePage> {
             },
           ),
         ]),
-        body:
-            // use the feed in body
-            const feed
-                .Feed() // <--- This trailing comma makes auto-formatting nicer for build methods.
-
-        // This trailing comma makes auto-formatting nicer for build methods.
-        );
+        body: Stack(
+          children: [
+            const feed.Feed(),
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: recordingButton.RecordingButton(),
+              ),
+            ),
+          ],
+        ));
   }
 }
