@@ -3,7 +3,8 @@ import 'package:memgeo/feedObject.dart' as feed;
 import 'package:memgeo/recordingButton.dart' as recordingButton;
 import 'package:memgeo/models/recorder_model.dart';
 import 'package:provider/provider.dart';
-import 'package:permission_handler/permission_handler.dart';
+import 'package:memgeo/permissions.dart';
+import 'package:provider/provider.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,8 +36,23 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
+  bool _hasRecording = false;
+  @override
+  void initState() {
+    super.initState();
+    recordPermissionsRequest().then((value) {
+      if (value) {
+        print('Permissions granted');
+      } else {
+        print('Permissions not granted');
+      }
+      setState(() {});
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    final recordingState = Provider.of<RecorderProvider>(context);
     return Scaffold(
         // appbar with three icons that change screen on click
         appBar: AppBar(actions: [
@@ -63,14 +79,24 @@ class _MyHomePageState extends State<MyHomePage> {
           children: [
             const feed.Feed(),
             Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: recordingButton.RecordingButton(),
-              ),
-            ),
+                bottom: 0,
+                child: Container(
+                    height: 50,
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: recordingButton.RecordingButton(),
+                        ),
+                        recordingState.hasRecording
+                            ? Expanded(
+                                child:
+                                    recordingButton.PlayLocalRecordingButton(),
+                              )
+                            : Expanded(child: Container())
+                      ],
+                    ))),
           ],
         ));
   }

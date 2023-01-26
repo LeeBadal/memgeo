@@ -1,21 +1,33 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:audioplayers/audioplayers.dart';
 
-class RecorderProvider with ChangeNotifier {
-  final FlutterSoundRecorder _flutterSoundRecorder = FlutterSoundRecorder();
-  bool _isRecording = false;
+enum PlaybackState { play, pause, resume }
 
+class RecorderProvider with ChangeNotifier {
+  PlaybackState _playbackState = PlaybackState.play;
+  final FlutterSoundRecorder _flutterSoundRecorder = FlutterSoundRecorder();
+  final FlutterSoundPlayer _audioPlayer = FlutterSoundPlayer();
+  bool _isRecording = false;
+  String _hasPath = "";
+  bool _hasRecording = false;
+  late StreamSubscription<PlaybackDisposition> _onPlayerCompletionSubscription;
+
+  PlaybackState get playbackState => _playbackState;
+  String get hasPath => _hasPath;
   bool get isRecording => _isRecording;
+  bool get hasRecording => _hasRecording;
+  FlutterSoundPlayer get audioPlayer => _audioPlayer;
+  StreamSubscription<PlaybackDisposition> get onPlayerCompletionSubscription =>
+      _onPlayerCompletionSubscription;
 
   Future<void> startRecording() async {
-    PermissionStatus status = await Permission.microphone.status;
-    if (status != PermissionStatus.granted) {
-      await Permission.microphone.request();
+    if (_isRecording) {
+      return;
     }
-    status = await Permission.storage.status;
-    if (status != PermissionStatus.granted) await Permission.storage.request();
     await _flutterSoundRecorder.openRecorder();
     await _flutterSoundRecorder.startRecorder(
       toFile: "test",
@@ -26,38 +38,62 @@ class RecorderProvider with ChangeNotifier {
   }
 
   Future<void> stopRecording() async {
-    dynamic what = await _flutterSoundRecorder.stopRecorder();
+    String? recordingPath;
+    recordingPath = await _flutterSoundRecorder.stopRecorder();
     await _flutterSoundRecorder.closeRecorder();
-    print(what);
     _isRecording = false;
+    recordingPath != null ? _hasPath = recordingPath : _hasPath = "";
     notifyListeners();
     print("Recording stopped");
-    // play the recording that was just made
-    FlutterSoundPlayer? audioPlayer = FlutterSoundPlayer();
-    await audioPlayer.openPlayer();
-    await audioPlayer.startPlayer(
-      fromURI: what,
+  }
+
+  Future<void> playRecentRecording() async {
+    await _audioPlayer.openPlayer();
+    await _audioPlayer.startPlayer(
+      fromURI: _hasPath,
       // codec: Codec.aacADTS,
     );
+    _playbackState = PlaybackState.pause;
+    notifyListeners();
   }
 
-  Future<bool> checkStoragePermission() async {
-    PermissionStatus permission = await Permission.storage.status;
-    if (permission != PermissionStatus.granted) {
-      PermissionStatus permission = await Permission.storage.request();
-      if (permission == PermissionStatus.granted) {
-        return true;
-      }
+  Future<void> pauseRecentRecording() async {
+    if (_audioPlayer.playerState.toString() == "PlayerState.isStopped") {
+      await playRecentRecording();
     } else {
-      return true;
+      await _audioPlayer.pausePlayer();
+      print("hello2" + _audioPlayer.playerState.toString());
+      _playbackState = PlaybackState.resume;
+      notifyListeners();
     }
-    return false;
   }
 
-  Future requestMicrophonePermission() async {
-    print('In Microphone permission method');
-    //WidgetsFlutterBinding.ensureInitialized();
+  Future<void> resumeRecentRecording() async {
+    if (_audioPlayer.playerState.toString() == "PlayerState.isStopped") {
+      await playRecentRecording();
+    } else {
+      await _audioPlayer.resumePlayer();
+      _playbackState = PlaybackState.pause;
+      notifyListeners();
+    }
+  }
 
-    await Permission.microphone.request();
+  void setHasRecording(bool value) {
+    _hasRecording = value;
+    notifyListeners();
+  }
+
+  void startListeningToPlayerCompletion() {
+    //check if player is initialized
+
+    _onPlayerCompletionSubscription =
+        _audioPlayer.dispositionStream()!.listen((event) {
+      if (event.duration.inMilliseconds == event.position.inMilliseconds) {
+        print("end of audio");
+        _audioPlayer.closePlayer();
+        _playbackState = PlaybackState.play;
+        notifyListeners();
+      }
+    });
   }
 }
