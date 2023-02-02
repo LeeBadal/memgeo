@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:memgeo/randomHelpers.dart' as memgeo;
 
 enum PlaybackState { play, pause, resume }
 
@@ -53,6 +54,7 @@ class RecorderProvider with ChangeNotifier {
       fromURI: _hasPath,
       // codec: Codec.aacADTS,
     );
+    //print(await memgeo.getFileSize(_hasPath, 1));
     _playbackState = PlaybackState.pause;
     notifyListeners();
   }

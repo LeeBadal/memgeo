@@ -5,25 +5,49 @@ import 'package:memgeo/models/recorder_model.dart';
 import 'package:provider/provider.dart';
 import 'package:memgeo/permissions.dart';
 import 'package:provider/provider.dart';
+import 'package:memgeo/location.dart' as geo;
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:memgeo/loginscreen.dart';
 
-void main() {
-  runApp(const MyApp());
+const kDebugMode = true;
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+
+// Ideal time to initialize
+  //if (kDebugMode) {
+  // await FirebaseAuth.instance.useAuthEmulator('192.168.0.8', 9099);
+  // }
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-        create: (_) => RecorderProvider(),
-        child: MaterialApp(
-          title: 'Flutter Demo',
-          theme: ThemeData(
-            primarySwatch: Colors.blue,
-          ),
-          home: const MyHomePage(title: 'Flutter Demo Home Page'),
-        ));
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData) {
+          return MaterialApp(builder: (context, snapshot) {
+            return ChangeNotifierProvider(
+                create: (_) => RecorderProvider(),
+                child: MaterialApp(
+                  title: 'Flutter Demo',
+                  theme: ThemeData(
+                    primarySwatch: Colors.blue,
+                  ),
+                  home: const MyHomePage(title: 'Flutter Demo Home Page'),
+                ));
+          });
+        } else {
+          return MaterialApp(
+            home: LoginScreen(),
+          );
+        }
+      },
+    );
   }
 }
 
@@ -59,6 +83,9 @@ class _MyHomePageState extends State<MyHomePage> {
           IconButton(
             icon: const Icon(Icons.home),
             onPressed: () {
+              geo.determineSubLocality().then((value) {
+                print(value);
+              });
               print('home');
             },
           ),
@@ -72,6 +99,8 @@ class _MyHomePageState extends State<MyHomePage> {
             icon: const Icon(Icons.settings),
             onPressed: () {
               print('settings');
+              //sign out
+              FirebaseAuth.instance.signOut();
             },
           ),
         ]),

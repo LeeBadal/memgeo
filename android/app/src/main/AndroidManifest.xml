@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.MICROPHONE" />
 
    <application
+        android:usesCleartextTraffic="true"
         android:label="memgeo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
