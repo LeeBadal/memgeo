@@ -12,6 +12,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _auth = FirebaseAuth.instance;
   String _email = '';
   String _password = '';
+  final _formKey = GlobalKey<FormState>();
 
   void _loginWithEmailAndPassword() async {
     try {
@@ -46,54 +47,62 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          color: Colors.blue,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: TextField(
-                onChanged: (value) => _email = value,
-                decoration: InputDecoration(
-                  hintText: 'Enter email',
-                  border: OutlineInputBorder(),
-                  fillColor: Colors.white,
+      body: SingleChildScrollView(
+        child: Container(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Email',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter an email';
+                    }
+                    return null;
+                  },
+                  onChanged: (value) {
+                    _email = value;
+                  },
                 ),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: TextField(
-                onChanged: (value) => _password = value,
-                decoration: InputDecoration(
-                    hintText: 'Enter password',
-                    border: OutlineInputBorder(),
-                    fillColor: Colors.white),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(foregroundColor: Colors.white),
-                onPressed: _loginWithEmailAndPassword,
-                child: Text('Sign in with email and password'),
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: OutlinedButton.icon(
-                icon: Icon(Icons.person_outline),
-                label: Text('Sign in anonymously'),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white,
+                SizedBox(height: 8.0),
+                TextFormField(
+                  decoration: InputDecoration(
+                    labelText: 'Password',
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter a password';
+                    }
+                    return null;
+                  },
+                  obscureText: true,
+                  onChanged: (value) {
+                    _password = value;
+                  },
                 ),
-                onPressed: _loginAnonymously,
-              ),
+                SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      // Login with email and password
+                    }
+                  },
+                  child: Text('Login with Email'),
+                ),
+                SizedBox(height: 16.0),
+                ElevatedButton.icon(
+                  onPressed: _loginAnonymously,
+                  icon: Icon(Icons.person),
+                  label: Text('Login Anonymously'),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
