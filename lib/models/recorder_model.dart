@@ -98,4 +98,12 @@ class RecorderProvider with ChangeNotifier {
       }
     });
   }
+
+  String hasRecordingReturnPath() {
+    if (_hasRecording) {
+      return _hasPath;
+    } else {
+      return "";
+    }
+  }
 }

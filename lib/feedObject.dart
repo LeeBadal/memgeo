@@ -272,32 +272,7 @@ class _FeedState extends State<Feed> {
           itemCount: feedObjects.length,
           itemBuilder: (BuildContext context, int index) {
             final feedObject = feedObjects[index];
-            return FeedObject(
-              title: feedObject.title,
-              text: feedObject.text,
-              coordinates: feedObject.coordinates,
-              datetime: feedObject.datetime,
-              audioUrl: feedObject.audioUrl,
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => FeedObjectDetails(
-                        uid: feedObject.uid,
-                        sublocality: feedObject.sublocality,
-                        title: feedObjectData.title,
-                        wall: feedObjectData.wall,
-                        coordinates: feedObjectData.sublocality,
-                        datetime: feedObjectData.datetime,
-                        audioUrl: feedObjectData.audioUrl,
-                        image: feedObjectData.image,
-                        likes: feedObjectData.likes,
-                        played: feedObjectData.played,
-                        user: feedObjectData.user,
-                      ),
-                    )); //MaterialPageRoute
-              }, //onTap
-            ); //FeedObject
+            return feedObject; //FeedObject
           }, //itemBuilder
         )); //ListView.builder
   } //_FeedState

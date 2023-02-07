@@ -10,6 +10,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:memgeo/loginscreen.dart';
+import 'package:memgeo/db/db.dart';
+import 'package:memgeo/models/post.dart';
+import 'package:memgeo/widgets/topappbar.dart';
 
 const kDebugMode = true;
 Future<void> main() async {
@@ -79,31 +82,7 @@ class _MyHomePageState extends State<MyHomePage> {
     final recordingState = Provider.of<RecorderProvider>(context);
     return Scaffold(
         // appbar with three icons that change screen on click
-        appBar: AppBar(actions: [
-          IconButton(
-            icon: const Icon(Icons.home),
-            onPressed: () {
-              geo.determineSubLocality().then((value) {
-                print(value);
-              });
-              print('home');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.search),
-            onPressed: () {
-              print('search');
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.settings),
-            onPressed: () {
-              print('settings');
-              //sign out
-              FirebaseAuth.instance.signOut();
-            },
-          ),
-        ]),
+        appBar: TopAppBar(),
         body: Stack(
           children: [
             const feed.Feed(),

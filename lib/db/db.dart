@@ -16,7 +16,7 @@ class Db {
           toFirestore: (PostObject po, _) => po.toFirestore(),
         );
     final docSnap = await ref.get();
-    final result = await docSnap.docs.map((e) => e.data()).toList();
+    final result = docSnap.docs.map((e) => e.data()).toList();
     return result;
   }
 }
