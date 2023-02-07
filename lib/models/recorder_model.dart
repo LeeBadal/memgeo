@@ -5,6 +5,8 @@ import 'package:flutter_sound/flutter_sound.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:memgeo/randomHelpers.dart' as memgeo;
+import 'package:memgeo/auth.dart';
+import 'package:provider/provider.dart';
 
 enum PlaybackState { play, pause, resume }
 
@@ -15,12 +17,14 @@ class RecorderProvider with ChangeNotifier {
   bool _isRecording = false;
   String _hasPath = "";
   bool _hasRecording = false;
+  String _filename = "";
   late StreamSubscription<PlaybackDisposition> _onPlayerCompletionSubscription;
 
   PlaybackState get playbackState => _playbackState;
   String get hasPath => _hasPath;
   bool get isRecording => _isRecording;
   bool get hasRecording => _hasRecording;
+  String get filename => _filename;
   FlutterSoundPlayer get audioPlayer => _audioPlayer;
   StreamSubscription<PlaybackDisposition> get onPlayerCompletionSubscription =>
       _onPlayerCompletionSubscription;
@@ -29,10 +33,13 @@ class RecorderProvider with ChangeNotifier {
     if (_isRecording) {
       return;
     }
+    final filename = AuthProvider().userId! + DateTime.now().toString();
+    print(filename);
     await _flutterSoundRecorder.openRecorder();
     await _flutterSoundRecorder.startRecorder(
       toFile: "test",
     );
+    _filename = filename;
     _isRecording = true;
     notifyListeners();
     print("Recording started");

@@ -4,6 +4,8 @@ import 'package:memgeo/models/post.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:memgeo/models/recorder_model.dart';
 import 'package:provider/provider.dart';
+import 'package:memgeo/db/storage.dart';
+import 'package:memgeo/postpage.dart';
 
 class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
   @override
@@ -32,26 +34,15 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
         },
       ),
       IconButton(
-        icon: const Icon(Icons.cloud_upload),
-        onPressed: () async {
-          if (Provider.of<RecorderProvider>(context, listen: false)
-              .hasRecording) {
-            try {
-              final po = await PostObject.create(
-                "test",
-                "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3",
-                "abc",
-                FirebaseAuth.instance.currentUser!.uid,
-                "textwall",
-              );
-              final db = Db();
-              db.addPostObject(po);
-            } catch (e) {
-              print(e);
-            }
-          }
-        },
-      )
+          icon: const Icon(Icons.cloud_upload),
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => PostPage(),
+              ),
+            );
+          })
     ]);
   }
 }
