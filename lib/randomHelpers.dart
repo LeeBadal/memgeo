@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'dart:io';
+import 'dart:ui';
 
 getFileSize(String filepath, int decimals) async {
   var file = File(filepath);
@@ -25,4 +26,15 @@ String generateUid() {
     uid += rng.nextInt(10).toString();
   }
   return uid;
+
+  // random background color
+}
+
+// random colour but not dark
+
+Color generateRandomLightColor() {
+  int red = Random().nextInt(128) + 128;
+  int green = Random().nextInt(128) + 128;
+  int blue = Random().nextInt(128) + 128;
+  return Color.fromARGB(255, red, green, blue);
 }

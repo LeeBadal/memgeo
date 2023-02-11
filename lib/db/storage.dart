@@ -14,4 +14,13 @@ class Storage {
     final url = await snapshot.ref.getDownloadURL();
     return url;
   }
+
+  // upload image to firebase storage
+  Future<String> uploadImage(String filename, String path) async {
+    final ref = _storage.ref().child("images/${filename}");
+    final uploadTask = ref.putFile(File(path));
+    final snapshot = await uploadTask;
+    final url = await snapshot.ref.getDownloadURL();
+    return url;
+  }
 }

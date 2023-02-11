@@ -19,4 +19,15 @@ class Db {
     final result = docSnap.docs.map((e) => e.data()).toList();
     return result;
   }
+
+  // retrieve x latest posts
+  Future<List<PostObject>> retrieveLatestPosts(int x) async {
+    final ref = _firestore.collection("posts").withConverter(
+          fromFirestore: PostObject.fromFirestore,
+          toFirestore: (PostObject po, _) => po.toFirestore(),
+        );
+    final docSnap = await ref.orderBy('date', descending: true).limit(x).get();
+    final result = docSnap.docs.map((e) => e.data()).toList();
+    return result;
+  }
 }
