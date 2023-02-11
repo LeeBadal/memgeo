@@ -1,3 +1,4 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'dart:math';
 
@@ -21,6 +22,7 @@ class _PostPageState extends State<PostPage> {
   TextEditingController _titleController = TextEditingController();
   TextEditingController _bodyController = TextEditingController();
   File _backgroundImage = File('');
+  String photoPath = '';
 
   void _updateBackgroundImage(File image) {
     setState(() {
@@ -34,6 +36,7 @@ class _PostPageState extends State<PostPage> {
     final XFile? photo = await picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
       final image = (File(photo.path));
+      photoPath = photo.path;
       _updateBackgroundImage(image);
     }
   }
@@ -101,6 +104,7 @@ class _PostPageState extends State<PostPage> {
         titleController: _titleController,
         bodyController: _bodyController,
         onTakePicture: takePicture,
+        photoPath: photoPath,
       ),
     );
   }
@@ -110,12 +114,16 @@ class TransparentAppBar extends StatelessWidget {
   final TextEditingController titleController;
   final TextEditingController bodyController;
   final VoidCallback onTakePicture;
+  bool imageExist = false;
+  String photoPath = '';
+  String imageUrl = '';
 
   TransparentAppBar({
     Key? key,
     required this.titleController,
     required this.bodyController,
     required this.onTakePicture,
+    required this.photoPath,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -125,7 +133,9 @@ class TransparentAppBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Icon(Icons.menu),
-          IconButton(icon: Icon(Icons.camera_alt), onPressed: onTakePicture),
+          IconButton(
+              icon: Icon(Icons.camera_alt),
+              onPressed: () => {onTakePicture, imageExist = true}),
           IconButton(
             icon: Icon(Icons.save),
             onPressed: () async {
@@ -140,11 +150,14 @@ class TransparentAppBar extends StatelessWidget {
                           .hasPath;
                   final storage = Storage();
                   final url = await storage.uploadAudio(filename, path);
-                  print(url);
+                  if (imageExist) {
+                    imageUrl = await storage.uploadImage(photoPath);
+                  }
+                  print(imageUrl);
                   final po = await PostObject.create(
                     titleController.text,
                     url,
-                    "abc",
+                    imageUrl,
                     FirebaseAuth.instance.currentUser!.uid,
                     bodyController.text,
                   );
