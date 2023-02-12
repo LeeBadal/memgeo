@@ -26,11 +26,32 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
         },
       ),
       IconButton(
-        icon: const Icon(Icons.settings),
+        icon: const Icon(Icons.logout),
         onPressed: () {
-          print('settings');
-          //sign out
-          FirebaseAuth.instance.signOut();
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Sign Out'),
+                content: Text('Are you sure you want to sign out?'),
+                actions: <Widget>[
+                  TextButton(
+                    child: Text('Cancel'),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  TextButton(
+                    child: Text('Yes'),
+                    onPressed: () {
+                      FirebaseAuth.instance.signOut();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              );
+            },
+          );
         },
       ),
       IconButton(

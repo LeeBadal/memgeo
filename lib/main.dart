@@ -4,15 +4,13 @@ import 'package:memgeo/recordingButton.dart' as recordingButton;
 import 'package:memgeo/models/recorder_model.dart';
 import 'package:provider/provider.dart';
 import 'package:memgeo/permissions.dart';
-import 'package:provider/provider.dart';
-import 'package:memgeo/location.dart' as geo;
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:memgeo/loginscreen.dart';
-import 'package:memgeo/db/db.dart';
-import 'package:memgeo/models/post.dart';
+
 import 'package:memgeo/widgets/topappbar.dart';
+import 'package:memgeo/memgeoTheme.dart';
 
 const kDebugMode = true;
 Future<void> main() async {
@@ -33,19 +31,22 @@ class MyApp extends StatelessWidget {
       stream: FirebaseAuth.instance.authStateChanges(),
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return MaterialApp(builder: (context, snapshot) {
-            return ChangeNotifierProvider(
-                create: (_) => RecorderProvider(),
-                child: MaterialApp(
-                  title: 'Flutter Demo',
-                  theme: ThemeData(
-                    primarySwatch: Colors.blue,
-                  ),
-                  home: const MyHomePage(title: 'Flutter Demo Home Page'),
-                ));
-          });
+          return MaterialApp(
+              theme: mgTheme.themeData,
+              builder: (context, snapshot) {
+                return ChangeNotifierProvider(
+                    create: (_) => RecorderProvider(),
+                    child: MaterialApp(
+                      title: 'Flutter Demo',
+                      theme: ThemeData(
+                        primarySwatch: Colors.blue,
+                      ),
+                      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+                    ));
+              });
         } else {
           return MaterialApp(
+            theme: mgTheme.themeData,
             home: LoginScreen(),
           );
         }

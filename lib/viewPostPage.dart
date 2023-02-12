@@ -1,35 +1,20 @@
-import 'dart:io';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
-import 'db/db.dart';
-import 'db/storage.dart';
 import 'models/post.dart';
-import 'models/recorder_model.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:memgeo/randomHelpers.dart';
 import 'package:audioplayers/audioplayers.dart';
-import 'package:memgeo/models/post.dart';
 
 class ViewPostPage extends StatefulWidget {
   final PostObject post;
-  const ViewPostPage({required Key key, required this.post}) : super(key: key);
+  const ViewPostPage({Key? key, required this.post}) : super(key: key);
   @override
   _ViewPostPageState createState() => _ViewPostPageState(post);
 }
 
 class _ViewPostPageState extends State<ViewPostPage> {
-  File _backgroundImage = File('');
+  late Future<NetworkImage> _backgroundImage;
   late AudioPlayer _audioPlayer;
   final PostObject post;
-
-  void _updateBackgroundImage(File image) {
-    setState(() {
-      _backgroundImage = image;
-    });
-  }
+  bool _isPlaying = true;
 
   @override
   _ViewPostPageState createState() => _ViewPostPageState(this.post);
@@ -40,7 +25,7 @@ class _ViewPostPageState extends State<ViewPostPage> {
     super.initState();
     // create an audio player that can play audio from a url
     _audioPlayer = AudioPlayer();
-    _audioPlayer.play(UrlSource(audioUrl));
+    _audioPlayer.play(UrlSource(post.audioUrl));
   }
 
   @override
@@ -54,12 +39,10 @@ class _ViewPostPageState extends State<ViewPostPage> {
           backgroundColor: generateRandomLightColor(),
           body: Container(
             decoration: BoxDecoration(
-              image: _backgroundImage.path == ''
-                  ? null
-                  : DecorationImage(
-                      image: FileImage(_backgroundImage),
-                      fit: BoxFit.cover,
-                    ),
+              image: DecorationImage(
+                image: Image.network(post.image).image,
+                fit: BoxFit.cover,
+              ),
             ),
             child: Column(
               children: [
@@ -67,18 +50,11 @@ class _ViewPostPageState extends State<ViewPostPage> {
 
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: TextField(
-                    controller: _titleController,
-                    maxLength: 40,
+                  child: Text(
+                    post.title,
                     style: TextStyle(
                       fontSize: 20,
                       color: Colors.white,
-                    ),
-                    decoration: InputDecoration(
-                      hintText: 'Title',
-                      hintStyle: TextStyle(
-                        fontSize: 20,
-                      ),
                     ),
                   ),
                 ),
@@ -90,27 +66,31 @@ class _ViewPostPageState extends State<ViewPostPage> {
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: TextField(
-                      controller: _bodyController,
-                      maxLines: null,
+                    child: Text(
+                      post.wall,
                       style: TextStyle(
                         fontSize: 16,
                         color: Colors.white,
                       ),
-                      decoration: InputDecoration(
-                        hintText: 'Text Wall',
-                      ),
                     ),
                   ),
                 ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_isPlaying) {
+                      _audioPlayer.pause();
+                    } else {
+                      //play the audioUrl from url
+                      _audioPlayer.play(UrlSource(post.audioUrl));
+                    }
+                    setState(() {
+                      _isPlaying = !_isPlaying;
+                    });
+                  },
+                  child: Text(_isPlaying ? 'Pause' : 'Play'),
+                ),
               ],
             ),
-          ),
-          bottomNavigationBar: TransparentAppBar(
-            titleController: _titleController,
-            bodyController: _bodyController,
-            onTakePicture: takePicture,
-            photoPath: photoPath,
           ),
         ));
   }

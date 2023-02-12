@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:core';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:memgeo/viewPostPage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:memgeo/db/db.dart';
 import 'package:memgeo/models/post.dart';
@@ -25,10 +26,11 @@ class FeedObject extends StatelessWidget {
   Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      child: ListTile(
+      child: Card(
+          child: ListTile(
         title: Text(title),
         subtitle: Text(text),
-      ),
+      )),
     );
   }
 }
@@ -110,38 +112,7 @@ class _FeedObjectDetailsState extends State<FeedObjectDetails> {
   // add build method
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-        onWillPop: () async {
-          _audioPlayer.stop();
-          return true;
-        },
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text(title),
-          ),
-          body: Column(
-            children: [
-              Text(wall),
-              Text(coordinates),
-              Text(datetime.toString()),
-              Text(audioUrl),
-              ElevatedButton(
-                onPressed: () {
-                  if (_isPlaying) {
-                    _audioPlayer.pause();
-                  } else {
-                    //play the audioUrl from url
-                    _audioPlayer.play(UrlSource(audioUrl));
-                  }
-                  setState(() {
-                    _isPlaying = !_isPlaying;
-                  });
-                },
-                child: Text(_isPlaying ? 'Pause' : 'Play'),
-              ),
-            ],
-          ),
-        ));
+    return Container();
   }
 }
 
@@ -172,33 +143,23 @@ class _FeedState extends State<Feed> {
   void _updateFeedObjects2(List<PostObject> data) {
     setState(() {
       feedObjects = data
-          .map((feedObjectData) => FeedObject(
-                title: feedObjectData.title,
-                text: feedObjectData.wall,
-                coordinates: feedObjectData.coordinates,
-                datetime: feedObjectData.datetime,
-                audioUrl: feedObjectData.audioUrl,
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => FeedObjectDetails(
-                        uid: feedObjectData.uid,
-                        sublocality: feedObjectData.sublocality,
-                        title: feedObjectData.title,
-                        wall: feedObjectData.wall,
-                        coordinates: feedObjectData.sublocality,
-                        datetime: feedObjectData.datetime,
-                        audioUrl: feedObjectData.audioUrl,
-                        image: feedObjectData.image,
-                        likes: feedObjectData.likes,
-                        played: feedObjectData.played,
-                        user: feedObjectData.user,
-                      ),
-                    ),
-                  );
-                },
-              ))
+          .map(
+            (feedObjectData) => FeedObject(
+              title: feedObjectData.title,
+              text: feedObjectData.wall,
+              coordinates: feedObjectData.coordinates,
+              datetime: feedObjectData.datetime,
+              audioUrl: feedObjectData.audioUrl,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ViewPostPage(post: feedObjectData),
+                  ),
+                );
+              },
+            ),
+          )
           .toList();
     });
   }

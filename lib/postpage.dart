@@ -129,51 +129,78 @@ class TransparentAppBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.transparent,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
+        color: Colors.transparent,
+        child:
+            Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
           Icon(Icons.menu),
           IconButton(
               icon: Icon(Icons.camera_alt),
               onPressed: () {
                 onTakePicture();
-                imageExistsSwitch();
               }),
           IconButton(
-            icon: Icon(Icons.save),
-            onPressed: () async {
-              if (Provider.of<RecorderProvider>(context, listen: false)
-                  .hasRecording) {
-                try {
-                  final filename =
-                      Provider.of<RecorderProvider>(context, listen: false)
-                          .filename;
-                  final path =
-                      Provider.of<RecorderProvider>(context, listen: false)
-                          .hasPath;
-                  final storage = Storage();
-                  final url = await storage.uploadAudio(filename, path);
-                  if (photoPath != '') {
-                    imageUrl = await storage.uploadImage(photoPath);
-                  }
-                  final po = await PostObject.create(
-                    titleController.text,
-                    url,
-                    imageUrl,
-                    FirebaseAuth.instance.currentUser!.uid,
-                    bodyController.text,
-                  );
-                  final db = Db();
-                  db.addPostObject(po);
-                } catch (e) {
-                  print(e);
-                }
-              }
-            },
-          ),
-        ],
-      ),
-    );
+              icon: Icon(Icons.save),
+              splashColor: Colors.black,
+              onPressed: () async {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Are you sure?'),
+                      content: Text('Do you want to upload this post?'),
+                      actions: [
+                        TextButton(
+                          child: Text('Yes'),
+                          onPressed: () async {
+                            if (Provider.of<RecorderProvider>(context,
+                                    listen: false)
+                                .hasRecording) {
+                              try {
+                                final filename = Provider.of<RecorderProvider>(
+                                        context,
+                                        listen: false)
+                                    .filename;
+                                final path = Provider.of<RecorderProvider>(
+                                        context,
+                                        listen: false)
+                                    .hasPath;
+                                final storage = Storage();
+                                final url =
+                                    await storage.uploadAudio(filename, path);
+                                if (photoPath != '') {
+                                  imageUrl =
+                                      await storage.uploadImage(photoPath);
+                                }
+                                final po = await PostObject.create(
+                                  titleController.text,
+                                  url,
+                                  imageUrl,
+                                  FirebaseAuth.instance.currentUser!.uid,
+                                  bodyController.text,
+                                );
+                                final db = Db();
+                                db.addPostObject(po);
+                              } catch (e) {
+                                print(e);
+                              }
+                              int counter = 0;
+                              Navigator.popUntil(context, (route) {
+                                return counter++ == 2;
+                              });
+                            }
+                          },
+                        ),
+                        TextButton(
+                          child: Text('No'),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                );
+              }),
+        ]));
   }
 }
