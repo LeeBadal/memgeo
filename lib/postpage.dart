@@ -1,6 +1,4 @@
-import 'dart:ffi';
 import 'dart:io';
-import 'dart:math';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -80,7 +78,6 @@ class _PostPageState extends State<PostPage> {
               height: 1,
               margin: EdgeInsets.only(left: 8, right: 8),
             ),
-            IconButton(icon: Icon(Icons.camera_alt), onPressed: takePicture),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(8.0),
@@ -118,6 +115,10 @@ class TransparentAppBar extends StatelessWidget {
   String photoPath = '';
   String imageUrl = '';
 
+  void imageExistsSwitch() {
+    imageExist = !imageExist;
+  }
+
   TransparentAppBar({
     Key? key,
     required this.titleController,
@@ -135,7 +136,10 @@ class TransparentAppBar extends StatelessWidget {
           Icon(Icons.menu),
           IconButton(
               icon: Icon(Icons.camera_alt),
-              onPressed: () => {onTakePicture, imageExist = true}),
+              onPressed: () {
+                onTakePicture();
+                imageExistsSwitch();
+              }),
           IconButton(
             icon: Icon(Icons.save),
             onPressed: () async {
@@ -150,10 +154,9 @@ class TransparentAppBar extends StatelessWidget {
                           .hasPath;
                   final storage = Storage();
                   final url = await storage.uploadAudio(filename, path);
-                  if (imageExist) {
+                  if (photoPath != '') {
                     imageUrl = await storage.uploadImage(photoPath);
                   }
-                  print(imageUrl);
                   final po = await PostObject.create(
                     titleController.text,
                     url,

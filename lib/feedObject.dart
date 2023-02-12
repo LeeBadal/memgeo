@@ -162,67 +162,6 @@ class _FeedState extends State<Feed> {
     //fetchData
   }
 
-/*   Future<void> fakefetchData() async {
-    // Simulate a delay to simulate an API call
-    await Future.delayed(const Duration(seconds: 2));
-    // Create some fake
-    final data = [
-      {
-        "title": "Feed Object 1",
-        "subtitle": "This is the first feed object",
-        "coordinates": "12.34,56.78",
-        "datetime": "2023-01-22",
-        "audioUrl":
-            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-      },
-      {
-        "title": "Feed Object 2",
-        "subtitle": "This is the second feed object",
-        "coordinates": "12.34,56.78",
-        "datetime": "2023-01-23",
-        "audioUrl":
-            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-      },
-      {
-        "title": "Feed Object 3",
-        "subtitle": "This is the third feed object",
-        "coordinates": "12.34,56.78",
-        "datetime": "2023-01-24",
-        "audioUrl":
-            "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
-      }
-    ];
-    _updateFeedObjects(data);
-  } */
-
-/*   void _updateFeedObjects(List<Map<String, dynamic>> data) {
-    setState(() {
-      feedObjects = data
-          .map((feedObjectData) => FeedObject(
-                title: feedObjectData['title'],
-                text: feedObjectData['subtitle'],
-                coordinates: feedObjectData['coordinates'],
-                datetime: DateTime.parse(feedObjectData['datetime']),
-                audioUrl: feedObjectData['audioUrl'],
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => FeedObjectDetails(
-                        title: feedObjectData['title'],
-                        wall: feedObjectData['subtitle'],
-                        coordinates: feedObjectData['coordinates'],
-                        datetime: DateTime.parse(feedObjectData['datetime']),
-                        audioUrl: feedObjectData['audioUrl'],
-                      ),
-                    ),
-                  );
-                },
-              ))
-          .toList();
-    });
-  } */
-
   Future<void> fetchData() async {
     final db = Db();
     List<PostObject> data = await db.retrievePosts();

@@ -30,4 +30,15 @@ class Db {
     final result = docSnap.docs.map((e) => e.data()).toList();
     return result;
   }
+
+  // retrieve post by uid
+  Future<PostObject> retrievePost(String uid) async {
+    final ref = _firestore.collection("posts").withConverter(
+          fromFirestore: PostObject.fromFirestore,
+          toFirestore: (PostObject po, _) => po.toFirestore(),
+        );
+    final docSnap = await ref.doc(uid).get();
+    final result = docSnap.data();
+    return result!;
+  }
 }
