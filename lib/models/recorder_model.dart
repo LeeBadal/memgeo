@@ -24,7 +24,9 @@ class RecorderProvider with ChangeNotifier {
   String get hasPath => _hasPath;
   bool get isRecording => _isRecording;
   bool get hasRecording => _hasRecording;
+  set hasRecording(bool value) => _hasRecording = value;
   String get filename => _filename;
+
   FlutterSoundPlayer get audioPlayer => _audioPlayer;
   StreamSubscription<PlaybackDisposition> get onPlayerCompletionSubscription =>
       _onPlayerCompletionSubscription;

@@ -10,6 +10,8 @@ import 'models/post.dart';
 import 'models/recorder_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:memgeo/randomHelpers.dart';
+import 'package:memgeo/widgets/successDialog.dart';
+import 'package:memgeo/recordingButton.dart' as recordingButton;
 
 class PostPage extends StatefulWidget {
   @override
@@ -41,6 +43,7 @@ class _PostPageState extends State<PostPage> {
 
   @override
   Widget build(BuildContext context) {
+    final recordingState = Provider.of<RecorderProvider>(context);
     return Scaffold(
       backgroundColor: generateRandomLightColor(),
       body: Container(
@@ -94,6 +97,20 @@ class _PostPageState extends State<PostPage> {
                 ),
               ),
             ),
+            Positioned(
+                bottom: 0,
+                child: SizedBox(
+                    height: 100,
+                    width: MediaQuery.of(context).size.width,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        recordingButton.RecordingButton(),
+                        recordingState.hasRecording
+                            ? recordingButton.PlayLocalRecordingButton()
+                            : Container()
+                      ],
+                    )))
           ],
         ),
       ),
@@ -152,6 +169,10 @@ class TransparentAppBar extends StatelessWidget {
                         TextButton(
                           child: Text('Yes'),
                           onPressed: () async {
+                            int counter = 0;
+                            Navigator.popUntil(context, (route) {
+                              return counter++ == 2;
+                            });
                             if (Provider.of<RecorderProvider>(context,
                                     listen: false)
                                 .hasRecording) {
@@ -181,12 +202,11 @@ class TransparentAppBar extends StatelessWidget {
                                 final db = Db();
                                 db.addPostObject(po);
                               } catch (e) {
+                                failedDialog(context,
+                                    message:
+                                        "There was an error, please try again");
                                 print(e);
                               }
-                              int counter = 0;
-                              Navigator.popUntil(context, (route) {
-                                return counter++ == 2;
-                              });
                             }
                           },
                         ),

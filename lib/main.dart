@@ -38,9 +38,7 @@ class MyApp extends StatelessWidget {
                     create: (_) => RecorderProvider(),
                     child: MaterialApp(
                       title: 'Flutter Demo',
-                      theme: ThemeData(
-                        primarySwatch: Colors.blue,
-                      ),
+                      theme: mgTheme.themeData,
                       home: const MyHomePage(title: 'Flutter Demo Home Page'),
                     ));
               });
@@ -87,25 +85,6 @@ class _MyHomePageState extends State<MyHomePage> {
         body: Stack(
           children: [
             const feed.Feed(),
-            Positioned(
-                bottom: 0,
-                child: Container(
-                    height: 50,
-                    width: MediaQuery.of(context).size.width,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Expanded(
-                          child: recordingButton.RecordingButton(),
-                        ),
-                        recordingState.hasRecording
-                            ? Expanded(
-                                child:
-                                    recordingButton.PlayLocalRecordingButton(),
-                              )
-                            : Expanded(child: Container())
-                      ],
-                    ))),
           ],
         ));
   }

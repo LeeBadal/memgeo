@@ -1,6 +1,7 @@
 import 'dart:math';
 import 'dart:io';
 import 'dart:ui';
+import 'package:intl/intl.dart';
 
 getFileSize(String filepath, int decimals) async {
   var file = File(filepath);
@@ -37,4 +38,11 @@ Color generateRandomLightColor() {
   int green = Random().nextInt(128) + 128;
   int blue = Random().nextInt(128) + 128;
   return Color.fromARGB(255, red, green, blue);
+}
+
+// remove milli seconds from datetime string
+String pformat(String datetime) {
+  DateTime dt = DateTime.parse(datetime);
+
+  return DateFormat('EEEE, MMMM d, yyyy, HH:mm').format(dt);
 }

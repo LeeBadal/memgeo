@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'models/post.dart';
 import 'package:memgeo/randomHelpers.dart';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:memgeo/randomHelpers.dart';
 
 class ViewPostPage extends StatefulWidget {
   final PostObject post;
@@ -36,7 +37,6 @@ class _ViewPostPageState extends State<ViewPostPage> {
           return true;
         },
         child: Scaffold(
-          backgroundColor: generateRandomLightColor(),
           body: Container(
             decoration: BoxDecoration(
               image: DecorationImage(
@@ -47,7 +47,6 @@ class _ViewPostPageState extends State<ViewPostPage> {
             child: Column(
               children: [
                 // button to take picture
-
                 Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Text(
@@ -75,6 +74,14 @@ class _ViewPostPageState extends State<ViewPostPage> {
                     ),
                   ),
                 ),
+                Text(
+                  "${post.sublocality}",
+                ),
+
+                Text(
+                  "${pformat(post.datetime)}",
+                ),
+
                 ElevatedButton(
                   onPressed: () {
                     if (_isPlaying) {

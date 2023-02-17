@@ -12,13 +12,15 @@ class RecordingButton extends StatefulWidget {
   State<RecordingButton> createState() => _RecordingButtonState();
 }
 
-class _RecordingButtonState extends State<RecordingButton> {
+class _RecordingButtonState extends State<RecordingButton>
+    with TickerProviderStateMixin {
+  late AnimationController _animationController;
   bool _isRecording = false;
-  bool _hasRecording = false;
 
   void _startRecording() {
     setState(() {
       _isRecording = true;
+      _animationController.forward(from: 0.0);
     });
     Provider.of<RecorderProvider>(context, listen: false).startRecording();
   }
@@ -26,34 +28,65 @@ class _RecordingButtonState extends State<RecordingButton> {
   void _stopRecording() {
     setState(() {
       _isRecording = false;
-      _hasRecording = true;
+      Provider.of<RecorderProvider>(context, listen: false).hasRecording = true;
+      _animationController.stop();
     });
     Provider.of<RecorderProvider>(context, listen: false).stopRecording();
   }
 
   @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final recordingState = Provider.of<RecorderProvider>(context);
     return GestureDetector(
       onTapDown: (details) {
         _startRecording();
       },
       onTapUp: (details) {
         _stopRecording();
-        recordingState.setHasRecording(true);
       },
-      child: Container(
-        width: double.infinity,
-        height: 50,
-        decoration: BoxDecoration(
-          color: _isRecording ? Colors.red : Colors.blue,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Center(
-          child: Text(
-            _isRecording ? "Recording..." : "Recording button",
-            style: TextStyle(color: Colors.white),
-          ),
+      child: SizedBox(
+        width: 100,
+        height: 100,
+        child: Stack(
+          children: [
+            Center(
+              child: Container(
+                width: 60,
+                height: 60,
+                decoration: BoxDecoration(
+                  color: _isRecording ? Colors.red : Colors.blue,
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+            Center(
+              child: SizedBox(
+                width: 80,
+                height: 80,
+                child: AnimatedBuilder(
+                  animation: _animationController,
+                  builder: (context, child) {
+                    return CircularProgressIndicator(
+                      value: _animationController.value,
+                      backgroundColor: Colors.grey,
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.red,
+                      ),
+                      strokeWidth: 5,
+                    );
+                  },
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -87,8 +120,8 @@ class _PlayLocalRecordingButtonState extends State<PlayLocalRecordingButton> {
   Widget build(BuildContext context) {
     playbackState =
         Provider.of<RecorderProvider>(context, listen: true).playbackState;
-    return GestureDetector(
-      onTap: () {
+    return IconButton(
+      onPressed: () {
         if (playbackState == PlaybackState.play) {
           Provider.of<RecorderProvider>(context, listen: false)
               .playRecentRecording();
@@ -100,23 +133,12 @@ class _PlayLocalRecordingButtonState extends State<PlayLocalRecordingButton> {
               .resumeRecentRecording();
         }
       },
-      child: Container(
-        width: double.infinity,
-        height: 50,
-        decoration: BoxDecoration(
-          color: Colors.blue,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        child: Center(
-          child: Text(
-            playbackState == PlaybackState.play
-                ? "Play recording"
-                : playbackState == PlaybackState.pause
-                    ? "Pause"
-                    : "Resume",
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
+      icon: Icon(
+        playbackState == PlaybackState.play
+            ? Icons.replay
+            : playbackState == PlaybackState.pause
+                ? Icons.pause
+                : Icons.play_arrow,
       ),
     );
   }
