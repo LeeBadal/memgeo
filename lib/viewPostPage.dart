@@ -48,7 +48,7 @@ class _ViewPostPageState extends State<ViewPostPage> {
               children: [
                 // button to take picture
                 Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(8.0) + EdgeInsets.only(top: 40),
                   child: Text(
                     post.title,
                     style: TextStyle(

@@ -62,7 +62,9 @@ class _RecordingButtonState extends State<RecordingButton>
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: _isRecording ? Colors.red : Colors.blue,
+                  color: _isRecording
+                      ? Colors.red
+                      : Color.fromARGB(255, 222, 243, 33),
                   shape: BoxShape.circle,
                 ),
               ),

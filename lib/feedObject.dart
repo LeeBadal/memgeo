@@ -1,36 +1,109 @@
 import 'package:flutter/material.dart';
 import 'dart:core';
 import 'package:audioplayers/audioplayers.dart';
+import 'package:memgeo/memgeoTheme.dart';
 import 'package:memgeo/viewPostPage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:memgeo/db/db.dart';
 import 'package:memgeo/models/post.dart';
+import 'package:memgeo/models/likes.dart';
 
-class FeedObject extends StatelessWidget {
+class FeedObject extends StatefulWidget {
   final String title;
   final String text;
   final String coordinates;
   final String datetime;
   final String audioUrl;
   final VoidCallback onTap;
+  final String uid;
 
-  FeedObject(
-      {required this.title,
-      required this.text,
-      required this.coordinates,
-      required this.datetime,
-      required this.audioUrl,
-      required this.onTap});
+  FeedObject({
+    required this.uid,
+    required this.title,
+    required this.text,
+    required this.coordinates,
+    required this.datetime,
+    required this.audioUrl,
+    required this.onTap,
+  });
+
+  @override
+  _FeedObjectState createState() => _FeedObjectState();
+}
+
+class _FeedObjectState extends State<FeedObject> {
+  late Likes likes = Likes(widget.uid);
+  late Future<bool> _isLikedFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadIsLiked();
+  }
+
+  void _loadIsLiked() {
+    _isLikedFuture = likes.hasLiked();
+  }
+
+  void _toggleLike() async {
+    bool isLiked = await likes.hasLiked();
+    if (isLiked) {
+      await likes.toggleLike();
+      setState(() {
+        _isLikedFuture = likes.hasLiked();
+      });
+    } else {
+      await likes.toggleLike();
+      setState(() {
+        _isLikedFuture = likes.hasLiked();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return InkWell(
-      onTap: onTap,
+      onTap: widget.onTap,
       child: Card(
-          child: ListTile(
-        title: Text(title),
-        subtitle: Text(text),
-      )),
+        child: ListTile(
+          title: Text(widget.title),
+          subtitle: Row(
+            children: [
+              Expanded(child: Container()),
+              FutureBuilder<bool>(
+                future: _isLikedFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!) {
+                    return IconButton(
+                      icon: Icon(Icons.star, color: Colors.yellow),
+                      onPressed: _toggleLike,
+                    );
+                  } else {
+                    return IconButton(
+                      icon: Icon(Icons.star_border),
+                      onPressed: _toggleLike,
+                    );
+                  }
+                },
+              ),
+              FutureBuilder<int>(
+                future: likes.getLikesCount(),
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    return Text(snapshot.data.toString());
+                  } else {
+                    return SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -145,6 +218,7 @@ class _FeedState extends State<Feed> {
       feedObjects = data
           .map(
             (feedObjectData) => FeedObject(
+              uid: feedObjectData.uid,
               title: feedObjectData.title,
               text: feedObjectData.wall,
               coordinates: feedObjectData.coordinates,

@@ -37,9 +37,9 @@ class MyApp extends StatelessWidget {
                 return ChangeNotifierProvider(
                     create: (_) => RecorderProvider(),
                     child: MaterialApp(
-                      title: 'Flutter Demo',
+                      title: 'Memgeo',
                       theme: mgTheme.themeData,
-                      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+                      home: const MyHomePage(title: 'Memgeo Home'),
                     ));
               });
         } else {

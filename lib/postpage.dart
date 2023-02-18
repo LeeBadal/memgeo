@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:memgeo/memgeoTheme.dart';
 import 'package:provider/provider.dart';
 
 import 'db/db.dart';
@@ -45,7 +46,7 @@ class _PostPageState extends State<PostPage> {
   Widget build(BuildContext context) {
     final recordingState = Provider.of<RecorderProvider>(context);
     return Scaffold(
-      backgroundColor: generateRandomLightColor(),
+      backgroundColor: mgSwatch,
       body: Container(
         decoration: BoxDecoration(
           image: _backgroundImage.path == ''
@@ -60,7 +61,7 @@ class _PostPageState extends State<PostPage> {
             // button to take picture
 
             Padding(
-              padding: const EdgeInsets.all(8.0),
+              padding: const EdgeInsets.all(8.0) + EdgeInsets.only(top: 40),
               child: TextField(
                 controller: _titleController,
                 maxLength: 40,
@@ -149,7 +150,11 @@ class TransparentAppBar extends StatelessWidget {
         color: Colors.transparent,
         child:
             Row(mainAxisAlignment: MainAxisAlignment.spaceBetween, children: [
-          Icon(Icons.menu),
+          IconButton(
+              icon: Icon(Icons.arrow_back_ios_new),
+              onPressed: () {
+                Navigator.pop(context);
+              }),
           IconButton(
               icon: Icon(Icons.camera_alt),
               onPressed: () {

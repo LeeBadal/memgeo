@@ -20,12 +20,6 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
         },
       ),
       IconButton(
-        icon: const Icon(Icons.search),
-        onPressed: () {
-          print('search');
-        },
-      ),
-      IconButton(
         icon: const Icon(Icons.logout),
         onPressed: () {
           showDialog(
