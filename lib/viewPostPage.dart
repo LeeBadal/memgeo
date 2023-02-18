@@ -82,7 +82,7 @@ class _ViewPostPageState extends State<ViewPostPage> {
                   "${pformat(post.datetime)}",
                 ),
 
-                ElevatedButton(
+                IconButton(
                   onPressed: () {
                     if (_isPlaying) {
                       _audioPlayer.pause();
@@ -94,7 +94,10 @@ class _ViewPostPageState extends State<ViewPostPage> {
                       _isPlaying = !_isPlaying;
                     });
                   },
-                  child: Text(_isPlaying ? 'Pause' : 'Play'),
+                  icon: Icon(
+                    _isPlaying ? Icons.pause : Icons.play_arrow,
+                    color: Colors.black,
+                  ),
                 ),
               ],
             ),

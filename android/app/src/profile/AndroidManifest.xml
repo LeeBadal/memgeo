@@ -18,4 +18,5 @@
     <uses-permission android:name="android.permission.MICROPHONE" />
     <uses-permission android:name="android.permission.CAMERA" />
     
+    
 </manifest>

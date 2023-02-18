@@ -66,6 +66,7 @@ class _FeedObjectState extends State<FeedObject> {
       onTap: widget.onTap,
       child: Card(
         child: ListTile(
+          tileColor: mgSwatch[100],
           title: Text(widget.title),
           subtitle: Row(
             children: [
@@ -75,7 +76,10 @@ class _FeedObjectState extends State<FeedObject> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data!) {
                     return IconButton(
-                      icon: Icon(Icons.star, color: Colors.yellow),
+                      icon: Icon(
+                        Icons.star,
+                        color: mgSwatch2,
+                      ),
                       onPressed: _toggleLike,
                     );
                   } else {

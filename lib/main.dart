@@ -16,7 +16,7 @@ const kDebugMode = true;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
+  //await FlutterConfig.loadEnvVariables(); // Load environment variables (androidmanifest google maps)
 // Ideal time to initialize
   //if (kDebugMode) {
   // await FirebaseAuth.instance.useAuthEmulator('192.168.0.8', 9099);

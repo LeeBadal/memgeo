@@ -41,16 +41,4 @@ class Db {
     final result = docSnap.data();
     return result!;
   }
-
-  // add like to post
-  Future<void> addLike(String uid) async {
-    final ref = _firestore.collection("posts").withConverter(
-          fromFirestore: PostObject.fromFirestore,
-          toFirestore: (PostObject po, _) => po.toFirestore(),
-        );
-    final docSnap = await ref.doc(uid).get();
-    final result = docSnap.data();
-    final likes = result!.likes + 1;
-    await ref.doc(uid).update({'likes': likes});
-  }
 }
