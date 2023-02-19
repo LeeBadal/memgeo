@@ -3,6 +3,8 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:memgeo/location.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:memgeo/db/db.dart';
+import 'package:memgeo/models/post.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -97,5 +99,11 @@ class _MapScreenState extends State<MapScreen> {
       ),
     );
     setState(() => _markers.add(marker));
+  }
+
+  //populate the map with markers with the locations of the feed objects
+  void _populateMarkers() async {
+    final db = Db();
+    List<PostObject> data = await db.retrievePosts();
   }
 }
