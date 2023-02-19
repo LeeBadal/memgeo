@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:memgeo/location.dart';
+import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -25,6 +26,7 @@ class _MapScreenState extends State<MapScreen> {
     final position = await determinePosition();
     setState(() {
       _initialPosition = LatLng(position.latitude, position.longitude);
+      _addMarker(_initialPosition);
       _locationLoaded = true;
     });
   }
@@ -37,7 +39,7 @@ class _MapScreenState extends State<MapScreen> {
           ? FlutterMap(
               options: MapOptions(
                 center: _initialPosition,
-                zoom: 12.0,
+                zoom: 15.0,
               ),
               children: [
                 TileLayer(
@@ -45,7 +47,29 @@ class _MapScreenState extends State<MapScreen> {
                       "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
                   subdomains: ['a', 'b', 'c'],
                 ),
-                MarkerLayer(markers: _markers)
+                MarkerClusterLayerWidget(
+                    options: MarkerClusterLayerOptions(
+                        maxClusterRadius: 45,
+                        size: const Size(40, 40),
+                        anchor: AnchorPos.align(AnchorAlign.center),
+                        fitBoundsOptions: const FitBoundsOptions(
+                          padding: EdgeInsets.all(50),
+                          maxZoom: 15,
+                        ),
+                        markers: _markers,
+                        builder: (context, markers) {
+                          return Container(
+                            decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(20),
+                                color: Colors.blue),
+                            child: Center(
+                              child: Text(
+                                markers.length.toString(),
+                                style: const TextStyle(color: Colors.white),
+                              ),
+                            ),
+                          );
+                        }))
               ],
               nonRotatedChildren: [
                 AttributionWidget.defaultWidget(
