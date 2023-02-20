@@ -41,4 +41,21 @@ class Db {
     final result = docSnap.data();
     return result!;
   }
+
+//todo fix this
+  Future<List<List<<PostObject>><Map<String, dynamic>>> getFirstTenPostsOrderedByDate(
+      {DocumentSnapshot? startAfter}) async {
+    final ref = _firestore
+        .collection("posts")
+        .orderBy('date', descending: true)
+        .limit(10);
+    if (startAfter != null) {
+      ref.startAfterDocument(startAfter);
+    }
+    final querySnapshot = await ref.get();
+    final posts = querySnapshot.docs.map((doc) => doc.data()).toList();
+    final lastDoc =
+        querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
+    return [posts, lastDoc];
+  }
 }

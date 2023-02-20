@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:memgeo/memgeoTheme.dart';
 
 import 'main.dart';
 
@@ -47,17 +48,21 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: mgSwatch,
       body: SingleChildScrollView(
         child: Container(
-          padding: const EdgeInsets.all(16.0),
+          padding:
+              const EdgeInsets.all(16.0) + EdgeInsets.fromLTRB(0, 32, 0, 0),
           child: Form(
             key: _formKey,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 TextFormField(
+                  style: TextStyle(color: mgSwatch2),
                   decoration: InputDecoration(
                     labelText: 'Email',
+                    labelStyle: TextStyle(color: mgSwatch2),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -71,8 +76,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 8.0),
                 TextFormField(
+                  style: TextStyle(color: mgSwatch2),
                   decoration: InputDecoration(
                     labelText: 'Password',
+                    labelStyle: TextStyle(color: mgSwatch2),
                   ),
                   validator: (value) {
                     if (value == null || value.isEmpty) {
@@ -92,13 +99,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       // Login with email and password
                     }
                   },
-                  child: Text('Login with Email'),
+                  child: Text('Sign in with Email'),
                 ),
                 SizedBox(height: 16.0),
                 ElevatedButton.icon(
                   onPressed: _loginAnonymously,
                   icon: Icon(Icons.person),
-                  label: Text('Login Anonymously'),
+                  label: Text('Sign in Anonymously'),
                 ),
               ],
             ),

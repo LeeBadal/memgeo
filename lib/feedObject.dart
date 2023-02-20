@@ -202,12 +202,44 @@ class Feed extends StatefulWidget {
 
 class _FeedState extends State<Feed> {
   List<FeedObject> feedObjects = [];
+  final int _pageSize = 10;
+  int _currentPage = 0;
+  final _scrollController = ScrollController();
 
   @override
   void initState() {
     super.initState();
     fetchData();
     //fetchData
+    _scrollController.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels ==
+        _scrollController.position.maxScrollExtent) {
+      _loadMore();
+    }
+  }
+
+  void _loadMore() async {
+    setState(() {
+      _currentPage++;
+    });
+    try {
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('your-collection')
+          .orderBy('createdAt', descending: true)
+          .limit(_pageSize)
+          .offset(_currentPage * _pageSize)
+          .get();
+      final feedObjects =
+          querySnapshot.docs.map((doc) => FeedObject(doc)).toList();
+      setState(() {
+        this.feedObjects.addAll(feedObjects);
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   Future<void> fetchData() async {

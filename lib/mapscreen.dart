@@ -4,7 +4,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:memgeo/location.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:memgeo/db/db.dart';
+import 'package:memgeo/memgeoTheme.dart';
 import 'package:memgeo/models/post.dart';
+import 'package:memgeo/randomHelpers.dart';
+import 'package:memgeo/viewPostPage.dart';
 
 class MapScreen extends StatefulWidget {
   @override
@@ -21,6 +24,7 @@ class _MapScreenState extends State<MapScreen> {
   void initState() {
     super.initState();
     _getUserLocation();
+    _populateMarkers();
     print(_initialPosition);
   }
 
@@ -43,6 +47,13 @@ class _MapScreenState extends State<MapScreen> {
                 center: _initialPosition,
                 zoom: 15.0,
               ),
+              nonRotatedChildren: [
+                AttributionWidget.defaultWidget(
+                  source: '© OpenStreetMap contributors',
+                  onSourceTapped: () {},
+                ),
+              ],
+              mapController: mapController,
               children: [
                 TileLayer(
                   urlTemplate:
@@ -63,7 +74,7 @@ class _MapScreenState extends State<MapScreen> {
                           return Container(
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(20),
-                                color: Colors.blue),
+                                color: mgSwatch2),
                             child: Center(
                               child: Text(
                                 markers.length.toString(),
@@ -73,13 +84,6 @@ class _MapScreenState extends State<MapScreen> {
                           );
                         }))
               ],
-              nonRotatedChildren: [
-                AttributionWidget.defaultWidget(
-                  source: '© OpenStreetMap contributors',
-                  onSourceTapped: () {},
-                ),
-              ],
-              mapController: mapController,
             )
           : Center(child: CircularProgressIndicator()),
     );
@@ -105,5 +109,21 @@ class _MapScreenState extends State<MapScreen> {
   void _populateMarkers() async {
     final db = Db();
     List<PostObject> data = await db.retrievePosts();
+    _markers = data
+        .map((value) => Marker(
+              point: string2latlng(value.coordinates),
+              builder: (context) => IconButton(
+                icon: Icon(Icons.whatshot_outlined),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => ViewPostPage(post: value)),
+                  );
+                },
+              ),
+            ))
+        .toList();
+    setState(() => _markers);
   }
 }

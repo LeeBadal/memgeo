@@ -2,6 +2,7 @@ import 'dart:math';
 import 'dart:io';
 import 'dart:ui';
 import 'package:intl/intl.dart';
+import 'package:latlong2/latlong.dart';
 
 getFileSize(String filepath, int decimals) async {
   var file = File(filepath);
@@ -45,4 +46,13 @@ String pformat(String datetime) {
   DateTime dt = DateTime.parse(datetime);
 
   return DateFormat('EEEE, MMMM d, yyyy, HH:mm').format(dt);
+}
+
+//convert coordinates string to latlang
+LatLng string2latlng(String coordinates) {
+  List<String> list = coordinates.split(",");
+  print(list);
+  double val1 = double.parse(list[0]);
+  double val2 = double.parse(list[1]);
+  return LatLng(val1, val2);
 }
