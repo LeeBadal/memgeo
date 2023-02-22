@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:memgeo/db/db.dart';
+import 'package:memgeo/favouriteScreen.dart';
 import 'package:memgeo/models/post.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:memgeo/models/recorder_model.dart';
@@ -62,6 +63,16 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
                   context,
                   MaterialPageRoute(
                     builder: (context) => PostPage(),
+                  ),
+                );
+              }),
+          IconButton(
+              icon: const Icon(Icons.favorite),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => FavoritesScreen(),
                   ),
                 );
               })

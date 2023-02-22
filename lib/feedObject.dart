@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'dart:core';
 import 'package:audioplayers/audioplayers.dart';
@@ -7,6 +8,8 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:memgeo/db/db.dart';
 import 'package:memgeo/models/post.dart';
 import 'package:memgeo/models/likes.dart';
+
+import 'models/favorite.dart';
 
 class FeedObject extends StatefulWidget {
   final String title;
@@ -33,12 +36,19 @@ class FeedObject extends StatefulWidget {
 
 class _FeedObjectState extends State<FeedObject> {
   late Likes likes = Likes(widget.uid);
+  late Favorites favorites = Favorites(widget.uid);
   late Future<bool> _isLikedFuture;
+  late Future<bool> _isFavoritedFuture;
 
   @override
   void initState() {
     super.initState();
     _loadIsLiked();
+    _loadIsFavorited();
+  }
+
+  void _loadIsFavorited() {
+    _isFavoritedFuture = favorites.hasFav();
   }
 
   void _loadIsLiked() {
@@ -56,6 +66,21 @@ class _FeedObjectState extends State<FeedObject> {
       await likes.toggleLike();
       setState(() {
         _isLikedFuture = likes.hasLiked();
+      });
+    }
+  }
+
+  void _toggleFavorite() async {
+    bool isFavorited = await favorites.hasFav();
+    if (isFavorited) {
+      await favorites.toggleFav();
+      setState(() {
+        _isFavoritedFuture = favorites.hasFav();
+      });
+    } else {
+      await favorites.toggleFav();
+      setState(() {
+        _isFavoritedFuture = favorites.hasFav();
       });
     }
   }
@@ -86,6 +111,25 @@ class _FeedObjectState extends State<FeedObject> {
                     return IconButton(
                       icon: Icon(Icons.star_border),
                       onPressed: _toggleLike,
+                    );
+                  }
+                },
+              ),
+              FutureBuilder<bool>(
+                future: _isFavoritedFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!) {
+                    return IconButton(
+                      icon: Icon(
+                        Icons.favorite,
+                        color: Colors.red,
+                      ),
+                      onPressed: _toggleFavorite,
+                    );
+                  } else {
+                    return IconButton(
+                      icon: Icon(Icons.favorite_border),
+                      onPressed: _toggleFavorite,
                     );
                   }
                 },
@@ -202,56 +246,52 @@ class Feed extends StatefulWidget {
 
 class _FeedState extends State<Feed> {
   List<FeedObject> feedObjects = [];
-  final int _pageSize = 10;
+  final int _pageSize = 8;
   int _currentPage = 0;
+  bool _isLastPage = false;
+  bool _isLoading = false;
   final _scrollController = ScrollController();
-
-  @override
-  void initState() {
-    super.initState();
-    fetchData();
-    //fetchData
-    _scrollController.addListener(_onScroll);
-  }
+  DocumentSnapshot? pag;
 
   void _onScroll() {
-    if (_scrollController.position.pixels ==
-        _scrollController.position.maxScrollExtent) {
+    if (_scrollController.position.pixels >
+            _scrollController.position.maxScrollExtent * 0.8 &&
+        !_isLoading) {
       _loadMore();
+      _isLoading = true;
     }
   }
 
   void _loadMore() async {
-    setState(() {
-      _currentPage++;
-    });
-    try {
-      final querySnapshot = await FirebaseFirestore.instance
-          .collection('your-collection')
-          .orderBy('createdAt', descending: true)
-          .limit(_pageSize)
-          .offset(_currentPage * _pageSize)
-          .get();
-      final feedObjects =
-          querySnapshot.docs.map((doc) => FeedObject(doc)).toList();
-      setState(() {
-        this.feedObjects.addAll(feedObjects);
-      });
-    } catch (e) {
-      print(e);
+    _isLoading = true;
+    final db = Db();
+    List<dynamic> dataAndQueryDocument =
+        await db.retrievePostsPaginate(_pageSize, startAfter: pag);
+    pag = dataAndQueryDocument[1] as DocumentSnapshot?;
+    if (dataAndQueryDocument[0].length < _pageSize) {
+      setState(() => _isLastPage = true);
     }
+    _updateFeedObjects2(dataAndQueryDocument[0] as List<PostObject>);
+    _isLoading = false;
   }
 
   Future<void> fetchData() async {
     final db = Db();
-    List<PostObject> data = await db.retrievePosts();
-    _updateFeedObjects2(data);
+    List dataAndQueryDocument =
+        await db.retrievePostsPaginate(_pageSize, startAfter: pag);
+    pag = dataAndQueryDocument[1] as DocumentSnapshot?;
+    print(pag);
+    if (dataAndQueryDocument[0].length < _pageSize) {
+      setState(() => _isLastPage = true);
+    }
+    _updateFeedObjects2(dataAndQueryDocument[0] as List<PostObject>);
+    _isLoading = false;
   }
 
   //update feedobjects using postobjects
   void _updateFeedObjects2(List<PostObject> data) {
     setState(() {
-      feedObjects = data
+      feedObjects.addAll(data
           .map(
             (feedObjectData) => FeedObject(
               uid: feedObjectData.uid,
@@ -270,15 +310,25 @@ class _FeedState extends State<Feed> {
               },
             ),
           )
-          .toList();
+          .toList());
     });
+    print(feedObjects.length);
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    fetchData();
+    //fetchData
   }
 
   @override
   Widget build(BuildContext context) {
+    _scrollController.addListener(_onScroll);
     return RefreshIndicator(
         onRefresh: fetchData,
         child: ListView.builder(
+          controller: _scrollController,
           itemCount: feedObjects.length,
           itemBuilder: (BuildContext context, int index) {
             final feedObject = feedObjects[index];

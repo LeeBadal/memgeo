@@ -26,7 +26,8 @@ class Db {
           fromFirestore: PostObject.fromFirestore,
           toFirestore: (PostObject po, _) => po.toFirestore(),
         );
-    final docSnap = await ref.orderBy('date', descending: true).limit(x).get();
+    final docSnap =
+        await ref.orderBy('datetime', descending: true).limit(x).get();
     final result = docSnap.docs.map((e) => e.data()).toList();
     return result;
   }
@@ -42,20 +43,42 @@ class Db {
     return result!;
   }
 
-//todo fix this
-  Future<List<List<<PostObject>><Map<String, dynamic>>> getFirstTenPostsOrderedByDate(
+  Future<List<dynamic>> retrievePostsPaginate(int page,
       {DocumentSnapshot? startAfter}) async {
     final ref = _firestore
         .collection("posts")
-        .orderBy('date', descending: true)
-        .limit(10);
+        .orderBy('datetime', descending: true)
+        .withConverter(
+          fromFirestore: PostObject.fromFirestore,
+          toFirestore: (PostObject po, _) => po.toFirestore(),
+        )
+        .limit(page);
+    print("got new posts");
     if (startAfter != null) {
-      ref.startAfterDocument(startAfter);
+      print("start after");
+      print(startAfter);
+      final startAfterRef = ref.startAfterDocument(startAfter);
+      final querySnapshot = await startAfterRef.get();
+      final lastDoc =
+          querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
+      final posts = querySnapshot.docs.map((doc) => doc.data()).toList();
+      return [posts, lastDoc];
+    } else {
+      final querySnapshot = await ref.get();
+      final lastDoc =
+          querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
+      final posts = querySnapshot.docs.map((doc) => doc.data()).toList();
+      return [posts, lastDoc];
     }
-    final querySnapshot = await ref.get();
-    final posts = querySnapshot.docs.map((doc) => doc.data()).toList();
-    final lastDoc =
-        querySnapshot.docs.isNotEmpty ? querySnapshot.docs.last : null;
-    return [posts, lastDoc];
+  }
+
+  Future<PostObject> retrievePostUid(String uid) async {
+    final ref = _firestore.collection("posts").withConverter(
+          fromFirestore: PostObject.fromFirestore,
+          toFirestore: (PostObject po, _) => po.toFirestore(),
+        );
+    final querySnapshot = await ref.where('uid', isEqualTo: uid).limit(1).get();
+    final result = querySnapshot.docs.first.data();
+    return result!;
   }
 }
