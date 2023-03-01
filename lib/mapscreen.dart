@@ -25,7 +25,6 @@ class _MapScreenState extends State<MapScreen> {
     super.initState();
     _getUserLocation();
     _populateMarkers();
-    print(_initialPosition);
   }
 
   void _getUserLocation() async {

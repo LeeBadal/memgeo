@@ -51,7 +51,6 @@ String pformat(String datetime) {
 //convert coordinates string to latlang
 LatLng string2latlng(String coordinates) {
   List<String> list = coordinates.split(",");
-  print(list);
   double val1 = double.parse(list[0]);
   double val2 = double.parse(list[1]);
   return LatLng(val1, val2);

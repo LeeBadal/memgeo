@@ -53,10 +53,8 @@ class Db {
           toFirestore: (PostObject po, _) => po.toFirestore(),
         )
         .limit(page);
-    print("got new posts");
+
     if (startAfter != null) {
-      print("start after");
-      print(startAfter);
       final startAfterRef = ref.startAfterDocument(startAfter);
       final querySnapshot = await startAfterRef.get();
       final lastDoc =

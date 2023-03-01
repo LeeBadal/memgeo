@@ -85,25 +85,6 @@ class _PostCardState extends State<PostCard> {
             children: [
               Expanded(child: Container()),
               FutureBuilder<bool>(
-                future: _isLikedFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data!) {
-                    return IconButton(
-                      icon: Icon(
-                        Icons.thumb_up,
-                        color: mgSwatch2,
-                      ),
-                      onPressed: _toggleLike,
-                    );
-                  } else {
-                    return IconButton(
-                      icon: Icon(Icons.thumb_up_alt_outlined),
-                      onPressed: _toggleLike,
-                    );
-                  }
-                },
-              ),
-              FutureBuilder<bool>(
                 future: _isFavoritedFuture,
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data!) {
@@ -118,6 +99,25 @@ class _PostCardState extends State<PostCard> {
                     return IconButton(
                       icon: Icon(Icons.favorite_border),
                       onPressed: _toggleFavorite,
+                    );
+                  }
+                },
+              ),
+              FutureBuilder<bool>(
+                future: _isLikedFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!) {
+                    return IconButton(
+                      icon: Icon(
+                        Icons.thumb_up,
+                        color: mgSwatch2,
+                      ),
+                      onPressed: _toggleLike,
+                    );
+                  } else {
+                    return IconButton(
+                      icon: Icon(Icons.thumb_up_alt_outlined),
+                      onPressed: _toggleLike,
                     );
                   }
                 },

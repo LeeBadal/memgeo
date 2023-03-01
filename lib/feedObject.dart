@@ -97,25 +97,6 @@ class _FeedObjectState extends State<FeedObject> {
             children: [
               Expanded(child: Container()),
               FutureBuilder<bool>(
-                future: _isLikedFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.hasData && snapshot.data!) {
-                    return IconButton(
-                      icon: Icon(
-                        Icons.thumb_up,
-                        color: mgSwatch2,
-                      ),
-                      onPressed: _toggleLike,
-                    );
-                  } else {
-                    return IconButton(
-                      icon: Icon(Icons.thumb_up_outlined),
-                      onPressed: _toggleLike,
-                    );
-                  }
-                },
-              ),
-              FutureBuilder<bool>(
                 future: _isFavoritedFuture,
                 builder: (context, snapshot) {
                   if (snapshot.hasData && snapshot.data!) {
@@ -130,6 +111,25 @@ class _FeedObjectState extends State<FeedObject> {
                     return IconButton(
                       icon: Icon(Icons.favorite_border),
                       onPressed: _toggleFavorite,
+                    );
+                  }
+                },
+              ),
+              FutureBuilder<bool>(
+                future: _isLikedFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData && snapshot.data!) {
+                    return IconButton(
+                      icon: Icon(
+                        Icons.thumb_up,
+                        color: mgSwatch2,
+                      ),
+                      onPressed: _toggleLike,
+                    );
+                  } else {
+                    return IconButton(
+                      icon: Icon(Icons.thumb_up_outlined),
+                      onPressed: _toggleLike,
                     );
                   }
                 },
@@ -280,7 +280,6 @@ class _FeedState extends State<Feed> {
     List dataAndQueryDocument =
         await db.retrievePostsPaginate(_pageSize, startAfter: pag);
     pag = dataAndQueryDocument[1] as DocumentSnapshot?;
-    print(pag);
     if (dataAndQueryDocument[0].length < _pageSize) {
       setState(() => _isLastPage = true);
     }
@@ -312,7 +311,6 @@ class _FeedState extends State<Feed> {
           )
           .toList());
     });
-    print(feedObjects.length);
   }
 
   @override

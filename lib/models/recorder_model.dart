@@ -36,15 +36,14 @@ class RecorderProvider with ChangeNotifier {
       return;
     }
     final filename = AuthProvider().userId! + DateTime.now().toString();
-    print(filename);
+
     await _flutterSoundRecorder.openRecorder();
     await _flutterSoundRecorder.startRecorder(
-      toFile: "test",
+      toFile: "memgeo",
     );
     _filename = filename;
     _isRecording = true;
     notifyListeners();
-    print("Recording started");
   }
 
   Future<void> stopRecording() async {
@@ -54,7 +53,6 @@ class RecorderProvider with ChangeNotifier {
     _isRecording = false;
     recordingPath != null ? _hasPath = recordingPath : _hasPath = "";
     notifyListeners();
-    print("Recording stopped");
   }
 
   Future<void> playRecentRecording() async {
@@ -63,7 +61,6 @@ class RecorderProvider with ChangeNotifier {
       fromURI: _hasPath,
       // codec: Codec.aacADTS,
     );
-    //print(await memgeo.getFileSize(_hasPath, 1));
     _playbackState = PlaybackState.pause;
     notifyListeners();
   }
@@ -73,7 +70,7 @@ class RecorderProvider with ChangeNotifier {
       await playRecentRecording();
     } else {
       await _audioPlayer.pausePlayer();
-      print("hello2" + _audioPlayer.playerState.toString());
+
       _playbackState = PlaybackState.resume;
       notifyListeners();
     }
@@ -100,7 +97,6 @@ class RecorderProvider with ChangeNotifier {
     _onPlayerCompletionSubscription =
         _audioPlayer.dispositionStream()!.listen((event) {
       if (event.duration.inMilliseconds == event.position.inMilliseconds) {
-        print("end of audio");
         _audioPlayer.closePlayer();
         _playbackState = PlaybackState.play;
         notifyListeners();

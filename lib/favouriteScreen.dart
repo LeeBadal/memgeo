@@ -24,7 +24,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Future<void> _loadFavorites() async {
-    print(_userId);
     final snapshot = await _firestore.collection('favorites').get();
 
     final docs = snapshot.docs;
@@ -44,7 +43,6 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   }
 
   Future<PostCard> _getPostCard(String postId) async {
-    print('Getting post card for post ID $postId');
     final db = Db();
     final postObject = await db.retrievePostUid(postId);
     final postCard = PostCard(post: postObject);

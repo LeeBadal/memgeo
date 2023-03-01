@@ -33,7 +33,6 @@ class _PostPageState extends State<PostPage> {
 
   Future<void> takePicture() async {
     final ImagePicker picker = ImagePicker();
-    print(ImageSource.camera);
     final XFile? photo = await picker.pickImage(source: ImageSource.camera);
     if (photo != null) {
       final image = (File(photo.path));

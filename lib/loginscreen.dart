@@ -37,9 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void _loginAnonymously() async {
     try {
       final user = await _auth.signInAnonymously();
-      if (user != null) {
-        print("YIKES");
-      }
+      if (user != null) {}
     } catch (e) {
       print(e);
     }
@@ -106,6 +104,15 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: _loginAnonymously,
                   icon: Icon(Icons.person),
                   label: Text('Sign in Anonymously'),
+                ),
+                SizedBox(height: 16.0),
+                Container(
+                  margin: EdgeInsets.only(bottom: 16.0),
+                  child: Image.asset(
+                    'assets/biglogo.png',
+                    width: 150.0, // Adjust the width and height as needed
+                    height: 150.0,
+                  ),
                 ),
               ],
             ),
