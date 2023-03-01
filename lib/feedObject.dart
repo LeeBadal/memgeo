@@ -102,14 +102,14 @@ class _FeedObjectState extends State<FeedObject> {
                   if (snapshot.hasData && snapshot.data!) {
                     return IconButton(
                       icon: Icon(
-                        Icons.star,
+                        Icons.thumb_up,
                         color: mgSwatch2,
                       ),
                       onPressed: _toggleLike,
                     );
                   } else {
                     return IconButton(
-                      icon: Icon(Icons.star_border),
+                      icon: Icon(Icons.thumb_up_outlined),
                       onPressed: _toggleLike,
                     );
                   }
