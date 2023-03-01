@@ -14,7 +14,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   late final String _userId;
-  List<DocumentSnapshot> favoriteDocs = [];
+  List<String> favoriteDocs = [];
 
   @override
   void initState() {
@@ -25,14 +25,20 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
 
   Future<void> _loadFavorites() async {
     print(_userId);
-    final snapshot = await _firestore
-        .collection('favorites')
-        .where('users', arrayContains: _userId)
-        .get();
-    print(snapshot);
+    final snapshot = await _firestore.collection('favorites').get();
+
+    final docs = snapshot.docs;
+    for (var doc in docs) {
+      final postId = doc.id;
+      final userSnapshot =
+          await doc.reference.collection('users').doc(_userId).get();
+      if (userSnapshot.exists) {
+        favoriteDocs.add(postId);
+      }
+    }
     if (mounted) {
       setState(() {
-        favoriteDocs = snapshot.docs;
+        favoriteDocs = favoriteDocs;
       });
     }
   }
@@ -58,7 +64,7 @@ class _FavoritesScreenState extends State<FavoritesScreen> {
           : ListView.builder(
               itemCount: favoriteDocs.length,
               itemBuilder: (context, index) {
-                final postId = favoriteDocs[index].id;
+                final postId = favoriteDocs[index];
                 return FutureBuilder<PostCard>(
                   future: _getPostCard(postId),
                   builder: (context, snapshot) {
