@@ -43,6 +43,15 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  void _signUp() async {
+    try {
+      final user = await _auth.createUserWithEmailAndPassword(
+          email: _email.trim(), password: _password.trim());
+    } catch (e) {
+      throw e;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -94,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
-                      // Login with email and password
+                      _loginWithEmailAndPassword();
                     }
                   },
                   child: Text('Sign in with Email'),
@@ -114,6 +123,14 @@ class _LoginScreenState extends State<LoginScreen> {
                     height: 150.0,
                   ),
                 ),
+                ElevatedButton(
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      _signUp();
+                    }
+                  },
+                  child: Text('Sign up with email and password'),
+                )
               ],
             ),
           ),
