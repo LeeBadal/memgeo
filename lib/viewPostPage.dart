@@ -1,8 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'models/post.dart';
 import 'package:memgeo/randomHelpers.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:memgeo/randomHelpers.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ViewPostPage extends StatefulWidget {
   final PostObject post;
@@ -27,6 +29,18 @@ class _ViewPostPageState extends State<ViewPostPage> {
     // create an audio player that can play audio from a url
     _audioPlayer = AudioPlayer();
     _audioPlayer.play(UrlSource(post.audioUrl));
+  }
+
+  Future<void> reportPost() async {
+    final user = FirebaseAuth.instance.currentUser!;
+    final reportsRef = FirebaseFirestore.instance.collection('reports');
+    final reportDoc = reportsRef.doc();
+
+    await reportDoc.set({
+      'userId': user.uid,
+      'postId': post.uid,
+      'timestamp': DateTime.now(),
+    });
   }
 
   @override
@@ -98,6 +112,41 @@ class _ViewPostPageState extends State<ViewPostPage> {
                     _isPlaying ? Icons.pause : Icons.play_arrow,
                     color: Colors.black,
                   ),
+                ),
+                IconButton(
+                  icon: Icon(Icons.report),
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: Text('Report Post'),
+                          content: TextField(
+                            decoration:
+                                InputDecoration(hintText: 'Reason for report'),
+                          ),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                // Add flag to post in database
+                                // Close dialog
+                                reportPost();
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Submit'),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // Close dialog without reporting post
+                                Navigator.of(context).pop();
+                              },
+                              child: Text('Cancel'),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+                  },
                 ),
               ],
             ),

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:memgeo/memgeoTheme.dart';
+import 'package:memgeo/guidelines.dart';
 
 import 'main.dart';
 
@@ -130,7 +131,22 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                   },
                   child: Text('Sign up with email and password'),
-                )
+                ),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => CommunityGuidelinesScreen()));
+                  },
+                  child: Text(
+                    'By using this application you agree to Community Guidlines & User Policy',
+                    style: TextStyle(
+                      color: Colors.blue,
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
