@@ -11,10 +11,16 @@ import 'package:memgeo/loginscreen.dart';
 
 import 'package:memgeo/widgets/topappbar.dart';
 import 'package:memgeo/memgeoTheme.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
 const kDebugMode = true;
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  Future<InitializationStatus> _initGoogleMobileAds() {
+    // TODO: Initialize Google Mobile Ads SDK
+    return MobileAds.instance.initialize();
+  }
+
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
   //await FlutterConfig.loadEnvVariables(); // Load environment variables (androidmanifest google maps)
 // Ideal time to initialize

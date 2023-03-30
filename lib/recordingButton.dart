@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_sound/flutter_sound.dart';
+import 'package:memgeo/memgeoTheme.dart';
 import 'package:memgeo/models/recorder_model.dart';
 import 'package:provider/provider.dart';
 
@@ -62,9 +63,7 @@ class _RecordingButtonState extends State<RecordingButton>
                 width: 60,
                 height: 60,
                 decoration: BoxDecoration(
-                  color: _isRecording
-                      ? Colors.red
-                      : Color.fromARGB(255, 222, 243, 33),
+                  color: _isRecording ? Colors.red : mgSwatch2,
                   shape: BoxShape.circle,
                 ),
               ),

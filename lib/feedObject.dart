@@ -8,7 +8,9 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:memgeo/db/db.dart';
 import 'package:memgeo/models/post.dart';
 import 'package:memgeo/models/likes.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 
+import 'ads/adstate.dart';
 import 'models/favorite.dart';
 
 class FeedObject extends StatefulWidget {
@@ -247,10 +249,12 @@ class Feed extends StatefulWidget {
 class _FeedState extends State<Feed> {
   List<FeedObject> feedObjects = [];
   final int _pageSize = 8;
+  static const _kAdIndex = 4;
   int _currentPage = 0;
   bool _isLastPage = false;
   bool _isLoading = false;
   final _scrollController = ScrollController();
+  BannerAd? _ad;
   DocumentSnapshot? pag;
 
   void _onScroll() {
@@ -317,6 +321,25 @@ class _FeedState extends State<Feed> {
   void initState() {
     super.initState();
     fetchData();
+
+    BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _ad = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          // Releases an ad resource when it fails to load
+          ad.dispose();
+          debugPrint(
+              'Ad load failed (code=${error.code} message=${error.message})');
+        },
+      ),
+    ).load();
     //fetchData
   }
 
@@ -327,12 +350,33 @@ class _FeedState extends State<Feed> {
         onRefresh: fetchData,
         child: ListView.builder(
           controller: _scrollController,
-          itemCount: feedObjects.length,
+          itemCount: feedObjects.length + (_ad != null ? 1 : 0),
           itemBuilder: (BuildContext context, int index) {
-            final feedObject = feedObjects[index];
-            return feedObject; //FeedObject
+            if (_ad != null && index == _kAdIndex) {
+              return Container(
+                width: _ad!.size.width.toDouble(),
+                height: 72.0,
+                alignment: Alignment.center,
+                child: AdWidget(ad: _ad!),
+              );
+            } else {
+              final feedObject = feedObjects[_getDestinationItemIndex(index)];
+              return feedObject;
+            } //FeedObject
           }, //itemBuilder
         )); //ListView.builder
   } //_FeedState
 
+  @override
+  void dispose() {
+    _ad?.dispose();
+    super.dispose();
+  }
+
+  int _getDestinationItemIndex(int rawIndex) {
+    if (rawIndex >= _kAdIndex && _ad != null) {
+      return rawIndex - 1;
+    }
+    return rawIndex;
+  }
 } //Feed
