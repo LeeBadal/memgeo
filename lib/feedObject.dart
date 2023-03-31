@@ -288,6 +288,7 @@ class _FeedState extends State<Feed> {
       setState(() => _isLastPage = true);
     }
     _updateFeedObjects2(dataAndQueryDocument[0] as List<PostObject>);
+    newBannerAd();
     _isLoading = false;
   }
 
@@ -322,24 +323,6 @@ class _FeedState extends State<Feed> {
     super.initState();
     fetchData();
 
-    BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _ad = ad as BannerAd;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          // Releases an ad resource when it fails to load
-          ad.dispose();
-          debugPrint(
-              'Ad load failed (code=${error.code} message=${error.message})');
-        },
-      ),
-    ).load();
     //fetchData
   }
 
@@ -352,7 +335,7 @@ class _FeedState extends State<Feed> {
           controller: _scrollController,
           itemCount: feedObjects.length + (_ad != null ? 1 : 0),
           itemBuilder: (BuildContext context, int index) {
-            if (_ad != null && index == _kAdIndex) {
+            if (_ad != null && (index % _kAdIndex) == 0) {
               return Container(
                 width: _ad!.size.width.toDouble(),
                 height: 72.0,
@@ -378,5 +361,26 @@ class _FeedState extends State<Feed> {
       return rawIndex - 1;
     }
     return rawIndex;
+  }
+
+  void newBannerAd() {
+    BannerAd(
+      adUnitId: AdHelper.bannerAdUnitId,
+      size: AdSize.banner,
+      request: const AdRequest(),
+      listener: BannerAdListener(
+        onAdLoaded: (ad) {
+          setState(() {
+            _ad = ad as BannerAd;
+          });
+        },
+        onAdFailedToLoad: (ad, error) {
+          // Releases an ad resource when it fails to load
+          ad.dispose();
+          debugPrint(
+              'Ad load failed (code=${error.code} message=${error.message})');
+        },
+      ),
+    ).load();
   }
 } //Feed
