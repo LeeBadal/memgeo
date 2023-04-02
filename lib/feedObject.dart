@@ -247,14 +247,12 @@ class Feed extends StatefulWidget {
 }
 
 class _FeedState extends State<Feed> {
-  List<FeedObject> feedObjects = [];
+  List<dynamic> feedObjects = [];
   final int _pageSize = 8;
   static const _kAdIndex = 4;
-  int _currentPage = 0;
   bool _isLastPage = false;
   bool _isLoading = false;
   final _scrollController = ScrollController();
-  BannerAd? _ad;
   DocumentSnapshot? pag;
 
   void _onScroll() {
@@ -288,13 +286,16 @@ class _FeedState extends State<Feed> {
       setState(() => _isLastPage = true);
     }
     _updateFeedObjects2(dataAndQueryDocument[0] as List<PostObject>);
-    newBannerAd();
     _isLoading = false;
   }
 
   //update feedobjects using postobjects
   void _updateFeedObjects2(List<PostObject> data) {
     setState(() {
+      int startIndex = feedObjects.length;
+      int endIndex = data.length;
+      print(startIndex);
+      print(endIndex);
       feedObjects.addAll(data
           .map(
             (feedObjectData) => FeedObject(
@@ -315,6 +316,13 @@ class _FeedState extends State<Feed> {
             ),
           )
           .toList());
+      for (int i = startIndex; i < startIndex + endIndex; i++) {
+        print(i);
+        if (i % _kAdIndex == 0) {
+          print("this happened");
+          feedObjects.insert(i, BannerAdmob());
+        }
+      }
     });
   }
 
@@ -333,54 +341,24 @@ class _FeedState extends State<Feed> {
         onRefresh: fetchData,
         child: ListView.builder(
           controller: _scrollController,
-          itemCount: feedObjects.length + (_ad != null ? 1 : 0),
+          itemCount: feedObjects.length,
           itemBuilder: (BuildContext context, int index) {
-            if (_ad != null && (index % _kAdIndex) == 0) {
-              return Container(
-                width: _ad!.size.width.toDouble(),
-                height: 72.0,
-                alignment: Alignment.center,
-                child: AdWidget(ad: _ad!),
-              );
-            } else {
-              final feedObject = feedObjects[_getDestinationItemIndex(index)];
-              return feedObject;
-            } //FeedObject
+            final feedObject = feedObjects[index];
+            return feedObject;
+            //FeedObject
           }, //itemBuilder
         )); //ListView.builder
   } //_FeedState
 
   @override
   void dispose() {
-    _ad?.dispose();
     super.dispose();
   }
 
-  int _getDestinationItemIndex(int rawIndex) {
-    if (rawIndex >= _kAdIndex && _ad != null) {
-      return rawIndex - 1;
+  int _getDestinationItemIndex(int rawIndex, int adIndex) {
+    if (rawIndex % _kAdIndex != 0 && rawIndex >= _kAdIndex) {
+      return rawIndex - adIndex;
     }
     return rawIndex;
-  }
-
-  void newBannerAd() {
-    BannerAd(
-      adUnitId: AdHelper.bannerAdUnitId,
-      size: AdSize.banner,
-      request: const AdRequest(),
-      listener: BannerAdListener(
-        onAdLoaded: (ad) {
-          setState(() {
-            _ad = ad as BannerAd;
-          });
-        },
-        onAdFailedToLoad: (ad, error) {
-          // Releases an ad resource when it fails to load
-          ad.dispose();
-          debugPrint(
-              'Ad load failed (code=${error.code} message=${error.message})');
-        },
-      ),
-    ).load();
   }
 } //Feed
